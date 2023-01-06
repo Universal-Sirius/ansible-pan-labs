@@ -1,0 +1,3 @@
+---
+# tasks file for add_logging
+- include_tasks: add_log_forwarding.yml

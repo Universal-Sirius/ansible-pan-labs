@@ -1,0 +1,46 @@
+- name: Show all
+  paloaltonetworks.panos.panos_facts:
+    provider: '{{ provider }}'
+    gather_subset: ['!all']
+  register: all
+  
+- name: Show All
+  debug:
+    var: all
+    
+- name: Get all zones
+  paloaltonetworks.panos.panos_zone_facts:
+    provider: '{{ provider }}'
+  register: zones
+  
+- name: Show Zones
+  debug:
+    var: zones
+    
+- name: Get Session Info
+  paloaltonetworks.panos.panos_facts:
+    provider: '{{ provider }}'
+    gather_subset: ['session']
+  register: session
+  
+- name: Show Session Info
+  debug:
+    var: session
+  
+- name: Print maximum Palo session to screen
+  debug:
+    msg: "Maximum Sessions {{ session.ansible_facts.ansible_net_session_max }}"
+  
+- name: Print current Palo Sessions to screen
+  debug:
+    msg: "Current Sessions {{ session.ansible_facts.ansible_net_session_usage }}"
+  
+- name: Print Current Firewall Uptime to screen
+  debug:
+    msg: "Firewall Uptime {{ session.ansible_facts.ansible_net_uptime }}"
+  
+- name: Print Current Firewall Version to screen
+  debug:
+    msg: "Firewall Version {{ session.ansible_facts.ansible_net_version }}"
+    
+

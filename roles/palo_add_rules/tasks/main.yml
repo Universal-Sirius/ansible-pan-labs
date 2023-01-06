@@ -1,4 +1,0 @@
----
-- include_tasks: add_security_rules.yml
-- include_tasks: add_nat_rules.yml
-...

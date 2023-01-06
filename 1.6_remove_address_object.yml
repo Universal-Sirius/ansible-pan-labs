@@ -1,9 +1,0 @@
----
-- hosts: localhost
-  connection: local
-  gather_facts: False
-  
-  tasks:
-    - include_role:
-        name: palo_remove_address_object
-...

@@ -1,0 +1,13 @@
+  
+## Used for removing or adding, allow or deny rules
+## Could be modified to allow and deny but thinking most rules will be allow
+state: 'present'
+fwaction: 'allow'
+commit: 'False'
+
+### Where to add rules within the security policies RuleName (before or after)
+existing_rule: 'DENYALL'
+location: 'before'
+
+#Used for DNS Lookups
+dns_server: '10.0.0.11'

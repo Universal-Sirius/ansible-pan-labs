@@ -1,0 +1,14 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: False
+  
+  tasks:
+    - include_role:
+        name: '{{ role }}'
+      loop:
+        - palo_log_server
+        - palo_syslog
+      loop_control:
+        loop_var: role
+...

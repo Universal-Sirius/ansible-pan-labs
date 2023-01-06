@@ -1,0 +1,32 @@
+provider:
+  username: 'siduser101'
+  password: 'Ans1ble!'
+  ip_address: siduser101.pan.mysidlabs.com 
+
+#username: 'ansible_automation'
+#password: 'ansible'
+## Be sure path is writable
+#backup_path : '/home/ansible/'
+## Set to true to backup config
+#backup_configuration: 'true' 
+# palo_alto: '10.0.0.102'
+## Insert name of backup file to restore. If blank no restoration will occur
+## For restore ensure backup_configuration = true. Config will be backed up prior to restore of file
+#restore_file: ''
+#restore_configuration: ''
+
+## Used for building VPN plays. Ignored for all others
+#cloud_environment: 'aws'
+
+## Used for removing or adding, allow or deny rules
+## Could be modified to allow and deny but thinking most rules will be allow
+state: 'present'
+action: 'allow'
+commit: 'False'
+
+### Where to add rules within the security policies RuleName (before or after)
+existing_rule: 'Deny_All'
+location: 'before'
+
+#Used for DNS Lookups
+dns_server: '8.8.8.8'

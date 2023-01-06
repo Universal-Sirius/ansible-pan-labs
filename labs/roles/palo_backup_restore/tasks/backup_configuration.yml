@@ -1,0 +1,41 @@
+- name: Generate API Key
+  connection: local
+  uri:
+    validate_certs: no
+    url: 'https://{{provider.ip_address}}/api/?type=keygen&user={{provider.username}}&password={{provider.password}}'
+    return_content: yes
+    method: GET
+  register: key_string
+  
+- name: Extract Key from XML
+  connection: local
+  xml:
+    xmlstring: '{{key_string.content}}'
+    content: 'text'
+    xpath: '/response/result/key'
+  register: key_list
+
+- name: Grab Config using Key
+  connection: local
+  check_mode: no
+  uri:
+    validate_certs: no
+    url: "https://{{provider.ip_address}}/api/?type=config&action=show&key={{key_list.matches[0].key}}"
+    return_content: yes
+    method: GET
+  register: configuration_string
+  
+- name: Lookup the Date and Time
+  set_fact:
+    datetime: "{{ item }}"
+  loop: "{{ lookup('pipe','date +%Y-%m-%d-%H-%M', wantlist=True) }}"
+      
+- name: Show Date
+  debug:
+    msg: "Palo Alto Host {{provider.ip_address}} Configuration Saved in {{backup_path}} at {{datetime}}"
+  
+- name: Remove Config Header and Save at Backup Path
+  connection: local
+  copy:
+    content: "{{configuration_string['content']  | regex_replace('<response.*<result>') | regex_replace('</result></response>')}}"
+    dest: '{{backup_path}}backup-{{datetime}}.xml'

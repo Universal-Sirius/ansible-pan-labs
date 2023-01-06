@@ -181,14 +181,6 @@ Sirius
 Senior Solutions Architect
 rich.mallory@siriuscom.com
 
-Nate Helfrey
-Technical Architect
-nate.helfrey@siriuscom.com
-
-Roy Shaver
-Technical Architect
-roy.shaver@sirisucom.com
-
 Versions
 --------
 1.0 Initial Upload 6-16-2020

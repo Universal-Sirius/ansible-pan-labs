@@ -1,0 +1,11 @@
+- name: Create NoNat for AWS Access
+  panos_nat_rule:
+    provider: '{{ provider }}'
+    state: "{{ state }}"
+    rule_name: '{{ nat_rule_name }}'
+    source_zone: '{{ source_zone }}'
+    destination_zone: '{{ destination_zone_name }}'
+    source_ip: 'any'
+    destination_ip: 'any'
+    location: 'top'
+    commit: false

@@ -1,5 +1,0 @@
----
-remove_addr: 'server_6'
-#Comment out for Tower to ServiceNow Integration
-# remove comment to add back to run directly from cli or Tower
-...

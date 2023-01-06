@@ -1,0 +1,213 @@
+#### Get a list of all Security Groups
+- name: Get all address groups and their config
+  paloaltonetworks.panos.panos_object_facts:
+    provider: '{{ provider }}'
+    object_type: 'address-group'
+    name_regex: '.*'
+  register: palo_address_groups
+  
+- name: Show Palo Alto Addresses
+  debug:
+    msg: '{{ palo_address_groups }}' 
+
+#### Get All PreChange Security Rules
+- name: Get all Security Rules
+  paloaltonetworks.panos.panos_security_rule_facts:
+    provider: '{{ provider }}'
+    all_details: yes
+  register: palo_security_rules_pre
+
+- name: Get All Security Rule Names - Before Changes
+  set_fact:
+    orginal_rule_names: '{{ item.rule_name}}'
+  loop: '{{ palo_security_rules_pre.rule_details }}'
+
+#### Get All PreChange NAT Rules
+- name: Get all NAT Rules from Firewall before Changes
+  paloaltonetworks.panos.panos_nat_rule_facts:
+    provider: '{{ provider }}'
+    listing: true
+  register: palo_nat_rules_pre
+  
+- name: Get All Rule Names - Before Changes
+  set_fact:
+    orginal_natrule_names: "{{ item.rule_name}}"
+  loop: '{{ palo_nat_rules_pre.listing }}'
+  
+### Remove from all address groups
+- name: Remove address object from all groups
+  paloaltonetworks.panos.panos_address_group:
+    provider: '{{ provider }}'
+    name: '{{ item.name }}'
+    description: '{{ item.description | default(omit, true) }}'
+    static_value: '{{ item.static_value | difference([remove_addr]) }}'
+    tag: '{{ item.tag | default(omit, true) }}'
+    commit: false
+  loop: '{{ palo_address_groups.objects }}'
+  loop_control:
+    label: '{{ item.name }}'
+  when:
+    - item.static_value
+    - remove_addr in item.static_value
+
+### Remove Object from all security rules
+- name: Remove Address Object from Security Rules
+  paloaltonetworks.panos.panos_security_rule:
+    provider: '{{ provider }}'
+    rule_name: '{{ item.rule_name }}'
+    action: '{{ item.action }}'
+    antivirus:  '{{ item.antivirus | default(omit, true) }}'
+    application:  '{{ item.application | join("") }}'
+    category:  '{{ item.category | join("")  }}'
+    data_filtering:  '{{ item.data_filtering | default(omit, true) }}'
+    description: '{{ item.description | default(omit, true) }}'
+    destination_ip: '{{ item.destination_ip | difference([remove_addr]) }}'
+    destination_zone: '{{ item.destination_zone | default(omit, true) }}'
+    disable_server_response_inspection: '{{ item.disable_server_response_inspection | default(omit, true) }}'
+    file_blocking: '{{ item.file_blocking | default(omit, true) }}'
+    group_profile: '{{ item.group_profile | default(omit, true) }}'
+    icmp_unreachable: '{{ item.icmp_unreachable | default(omit, true) }}'
+    log_end: '{{ item.log_end | default(omit, true) }}'
+    log_setting: '{{ item.log_setting | default(omit, true) }}'
+    log_start: '{{ item.log_start | default(omit, true) }}'
+    negate_destination: '{{ item.negate_destination | default(omit, true) }}'
+    negate_source: '{{ item.negate_source | default(omit, true) }}'
+    rule_type: '{{ item.rule_type | default(omit, true) }}'
+    schedule: '{{ item.schedule | default(omit, true) }}'
+    service: '{{ item.service | default(omit, true) }}'
+    source_ip: '{{ item.source_ip | difference([remove_addr]) }}'
+    source_user: '{{ item.source_user | default(omit, true) }}'
+    source_zone: '{{ item.source_zone | default(omit, true) }}'
+    spyware: '{{ item.spyware | default(omit, true) }}'
+    tag_name: '{{ item.tag_name | default(omit, true) }}'
+    url_filtering: '{{ item.url_filtering | default(omit, true) }}'
+    vulnerability: '{{ item.vulnerability | default(omit, true) }}'
+    wildfire_analysis: '{{ item.wildfire_analysis | default(omit, true) }}'
+    state: present
+    commit: false
+  loop: '{{ palo_security_rules_pre.rule_details }}'
+  loop_control:
+    label: '{{ item.rule_name }}'
+  when: (remove_addr in item.destination_ip) or (remove_addr in item.source_ip)
+
+### Remove Object from all NAT rules
+- name: Remove Address Object from NAT Rules
+  paloaltonetworks.panos.panos_nat_rule:
+    provider: '{{ provider }}'
+    rule_name: '{{ item.rule_name }}'
+    destination_ip: '{{ item.destination_ip | difference([remove_addr]) }}'
+    destination_zone: '{{ item.destination_zone | join("") }}'
+    source_ip: '{{ item.source_ip | difference([remove_addr]) }}'
+    source_zone: '{{ item.source_zone }}'
+    description: '{{ item.description | default(omit, true) }}'
+    dnat_address: '{{ item.dnat_address | default(omit, true) }}'
+    dnat_port: '{{ item.dnat_port | default(omit, true) }}'
+    snat_interface_address: '{{ item.snat_interface_address | default(omit, true) }}'
+    service: '{{ item.service }}'
+    snat_address_type: '{{ item.snat_address_type | default(omit, true) }}'
+    snat_bidirectional: '{{ item.snat_bidirectional | default(omit, true) }}'
+    snat_dynamic_address: '{{ item.snat_dynamic_address | default(omit, true) }}'
+    snat_interface: '{{ item.snat_interface | default(omit, true) }}'
+    snat_static_address: '{{ item.snat_static_address | default(omit, true) }}'
+    snat_type: '{{ item.snat_type | default(omit, true) }}'
+    to_interface: '{{ item.to_interface | default(omit, true) }}'
+    tag: '{{ item.tag | default(omit, true) }}'
+    state: present
+    commit: false
+  loop: '{{ palo_nat_rules_pre.listing  }}'
+  loop_control:
+    label: '{{ item.rule_name }}'
+  when: (remove_addr in item.destination_ip) or (remove_addr in item.source_ip)
+  
+### Capture post change security rules
+- name: Reread all Security Rules for Changes
+  paloaltonetworks.panos.panos_security_rule_facts:
+    provider: '{{ provider }}'
+    all_details: yes
+  register: palo_security_rules_post
+  
+### Capture post change NAT Rules
+- name: Get all NAT Rules from Firewall after Changes
+  paloaltonetworks.panos.panos_nat_rule_facts:
+    provider: '{{ provider }}'
+    listing: true
+  register: palo_nat_rules_post
+  
+## This section removes any NAT rule with no source or destination - Assumption that object was removed
+- name: Disable NAT Rules with No Source or Destination Addresses
+  paloaltonetworks.panos.panos_nat_rule:
+    provider: '{{ provider }}'
+    rule_name: '{{ item.rule_name }}'
+    destination_ip: '{{ item.destination_ip | difference([remove_addr]) }}'
+    destination_zone: '{{ item.destination_zone | join("") }}'
+    source_ip: '{{ item.source_ip | difference([remove_addr]) }}'
+    source_zone: '{{ item.source_zone }}'
+    description: '{{ item.description | default(omit, true) }}'
+    dnat_address: '{{ item.dnat_address | default(omit, true) }}'
+    dnat_port: '{{ item.dnat_port | default(omit, true) }}'
+    snat_interface_address: '{{ item.snat_interface_address | default(omit, true) }}'
+    service: '{{ item.service }}'
+    snat_address_type: '{{ item.snat_address_type | default(omit, true) }}'
+    snat_bidirectional: '{{ item.snat_bidirectional | default(omit, true) }}'
+    snat_dynamic_address: '{{ item.snat_dynamic_address | default(omit, true) }}'
+    snat_interface: '{{ item.snat_interface | default(omit, true) }}'
+    snat_static_address: '{{ item.snat_static_address | default(omit, true) }}'
+    snat_type: '{{ item.snat_type | default(omit, true) }}'
+    to_interface: '{{ item.to_interface | default(omit, true) }}'
+    tag: '{{ item.tag | default(omit, true) }}'
+    state: disable
+    commit: false
+  loop: '{{ palo_nat_rules_post.listing }}'
+  loop_control:
+    label: '{{ item.rule_name }}'
+  when: (item.destination_ip == []) or (item.source_ip == [])
+  
+## This section removes any security rule with no source or destination - Assumption that object was removed
+- name: Disable Security Rules with No Source or Destination Addresses
+  paloaltonetworks.panos.panos_security_rule:
+    provider: '{{ provider }}'
+    rule_name: '{{ item.rule_name }}'
+    action: '{{ item.action }}'
+    antivirus:  '{{ item.antivirus | default(omit, true) }}'
+    application:  '{{ item.application | join("") }}'
+    category:  '{{ item.category | join("")  }}'
+    data_filtering:  '{{ item.data_filtering | default(omit, true) }}'
+    description: '{{ item.description | default(omit, true) }}'
+    destination_ip: '{{ item.destination_ip | default(omit, true) }}'
+    destination_zone: '{{ item.destination_zone | default(omit, true) }}'
+    disable_server_response_inspection: '{{ item.disable_server_response_inspection | default(omit, true) }}'
+    file_blocking: '{{ item.file_blocking | default(omit, true) }}'
+    group_profile: '{{ item.group_profile | default(omit, true) }}'
+    icmp_unreachable: '{{ item.icmp_unreachable | default(omit, true) }}'
+    log_end: '{{ item.log_end | default(omit, true) }}'
+    log_setting: '{{ item.log_setting | default(omit, true) }}'
+    log_start: '{{ item.log_start | default(omit, true) }}'
+    negate_destination: '{{ item.negate_destination | default(omit, true) }}'
+    negate_source: '{{ item.negate_source | default(omit, true) }}'
+    rule_type: '{{ item.rule_type | default(omit, true) }}'
+    schedule: '{{ item.schedule | default(omit, true) }}'
+    service: '{{ item.service | default(omit, true) }}'
+    source_ip: '{{ item.source_ip | default(omit, true) }}'
+    source_user: '{{ item.source_user | default(omit, true) }}'
+    source_zone: '{{ item.source_zone | default(omit, true) }}'
+    spyware: '{{ item.spyware | default(omit, true) }}'
+    tag_name: '{{ item.tag_name | default(omit, true) }}'
+    url_filtering: '{{ item.url_filtering | default(omit, true) }}'
+    vulnerability: '{{ item.vulnerability | default(omit, true) }}'
+    wildfire_analysis: '{{ item.wildfire_analysis | default(omit, true) }}'
+    state: present
+    disabled: true
+    commit: false
+  loop: '{{ palo_security_rules_post.rule_details }}'
+  loop_control:
+    label: '{{ item.rule_name }}'
+  when: (item.destination_ip == []) or (item.source_ip == [])
+
+
+#### Final Step is to Remove the Address Object
+- name: Remove the Address Object
+  paloaltonetworks.panos.panos_address_object:
+    provider: '{{ provider }}'
+    name: '{{ remove_addr }}'
+    state: 'absent'
+    commit: true

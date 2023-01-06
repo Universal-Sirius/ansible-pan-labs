@@ -1,0 +1,69 @@
+# Create Zones
+- name: create DMZ zone on a firewall
+  paloaltonetworks.panos.panos_zone:
+    provider: '{{ provider }}'
+    zone: "{{ item }}"
+    mode: 'layer3'
+    state: present
+  loop: "{{ zones }}"
+
+# Create interfaces
+- name: Eth1/1 Configuration
+  paloaltonetworks.panos.panos_interface:
+    provider: '{{ provider }}'
+    if_name: "ethernet1/1"
+    mode: "layer3"
+    enable_dhcp: yes
+    zone_name: "inside"
+
+- name: Eth1/2 Configuration
+  paloaltonetworks.panos.panos_interface:
+    provider: '{{ provider }}'
+    if_name: "ethernet1/2"
+    mode: "layer3"
+    enable_dhcp: yes
+    zone_name: "outside"
+
+# Setup dns, ntp and banner
+- name: set dns, ntp, and panorama but don't commit
+  paloaltonetworks.panos.panos_mgtconfig:
+    provider: '{{ provider }}'
+    dns_server_primary: "{{ dns_server_primary }}"
+    dns_server_secondary: "{{ dns_server_secondary }}"
+    ntp_server_primary: "{{ ntp_server_primary }}"
+    ntp_server_secondary: "{{ ntp_server_secondary }}"
+    timezone: "{{ timezone }}"
+    login_banner: "{{ login_banner }}"
+    domain: "{{ domain }}"
+    commit: False
+
+- name: Generic management settings
+  paloaltonetworks.panos.panos_mgtconfig:
+    provider: '{{ provider }}'
+    login_banner: '{{ login_banner }}'
+    commit: False
+
+## Administrators - Loop to add more
+- name: Add and Configure Administrator
+  paloaltonetworks.panos.panos_administrator:
+    provider: '{{ provider }}'
+    admin_username: '{{ admin_username }}'
+    admin_password: '{{ admin_password }}'
+    superuser: '{{ superuser }}'
+    state: '{{ state }}'
+    commit: false
+
+- name: Create snmp Profile
+  paloaltonetworks.panos.panos_snmp_profile:
+    provider: '{{ provider }}'
+    name: '{{ snmp_profile_name }}'
+    version: '{{ snmp_version }}'
+    
+# Create a snmp v2 server
+- name: Create snmp v2 server
+  paloaltonetworks.panos.panos_snmp_v2c_server:
+    provider: '{{ provider }}'
+    name: '{{ snmp_server_name }}'
+    manager: '{{ snmp_manager }}'
+    community: '{{ snmp_community }}'
+    snmp_profile: '{{ snmp_profile_name }}'

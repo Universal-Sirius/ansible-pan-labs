@@ -1,1 +1,16 @@
+ansible
+Jinja2>=3.0
+pan-python
+pandevice
+paramiko
+pyasn1
+pycparser
+pycrypto
+pyparsing
+PyYAML
+boto
+botocore
+boto3
 pan-os-python
+requests-toolbelt
+requests

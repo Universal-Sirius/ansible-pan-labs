@@ -1,0 +1,15 @@
+---
+ansible-navigator:
+  ansible:
+    inventory:
+      entries:
+      - inventory
+  execution-environment:
+    container-engine: podman
+    enabled: true
+    image: ghcr.io/mysidlabs/panlab-ee-1:latest
+    pull:
+      policy: missing
+  mode: stdout
+  playbook-artifact:
+    enable: false

@@ -1,0 +1,8 @@
+## Be sure path is writable
+backup_path: '/home/siduser101/pan-labs-ee-1/project/'
+## Set to true to backup config
+backup_configuration: 'true'
+## Insert name of backup file to restore. If blank no restoration will occur
+## For restore ensure backup_configuration = true. Config will be backed up prior to restore of file
+restore_file: 'backup-2022-10-27-18-57.xml'
+restore_configuration: 'false'

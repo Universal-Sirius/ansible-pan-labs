@@ -1,6 +1,0 @@
----
-# Username/Password used for Palo Alto/Panorama Login
-provider:
-  username: 'siduser250'
-  password: 'Spa2010!'
-  ip_address: 'siduser250.pan.mysidlabs.com'

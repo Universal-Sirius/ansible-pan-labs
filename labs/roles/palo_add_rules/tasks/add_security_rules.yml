@@ -1,0 +1,13 @@
+- name: Add Security Rules
+  panos_security_rule:
+    provider: '{{ provider }}'
+    state: '{{ state }}'
+    rule_name: '{{ security_rule_name }}'
+    description: '{{ security_rule_descrip }}'
+    source_zone: '{{ source_zone }}'
+    destination_zone: '{{ destination_zone_name }}'
+    application: ['any']
+    service: ['any']
+    action: 'allow'
+    location: 'top'
+    commit: false

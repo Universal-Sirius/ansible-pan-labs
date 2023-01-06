@@ -1,4 +1,0 @@
----
-- include_tasks: palo_vr_facts.yml
-- include_tasks: palo_facts.yml
-...

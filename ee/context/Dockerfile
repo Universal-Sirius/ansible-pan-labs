@@ -5,6 +5,8 @@ FROM $EE_BASE_IMAGE as galaxy
 ARG ANSIBLE_GALAXY_CLI_COLLECTION_OPTS=
 USER root
 
+ADD _build/ansible.cfg ~/.ansible.cfg
+
 ADD _build /build
 WORKDIR /build
 

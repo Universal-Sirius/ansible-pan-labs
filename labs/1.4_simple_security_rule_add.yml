@@ -1,0 +1,23 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: False
+  collections:
+    - paloaltonetworks.panos
+
+  tasks:
+  - name: Add Security Rules
+    panos_security_rule:
+      provider: '{{ provider }}'
+      state: 'present'
+      rule_name: 'DENYALL'
+      description: 'NOMOREANDTHEN'
+      source_zone: 'inside'
+      destination_zone: 'outside'
+      application: ['any']
+      service: ['application-default']
+      action: 'deny'
+      location: 'bottom'
+      log_setting: 'default'
+      commit: 'yes'
+...

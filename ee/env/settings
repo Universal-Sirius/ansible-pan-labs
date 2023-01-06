@@ -1,0 +1,5 @@
+# env/settings
+---
+container_image:  localhost/test_ee
+process_isolation_executable: podman # or docker
+process_isolation: true

@@ -1,0 +1,5 @@
+# Syslog Server vars
+syslog_server_profile_name: 'Main_SYSLOG_Profile'
+syslog_server_name: 'Syslog_Server_1'
+syslog_server_ip: '172.31.178.55'
+syslog_port: '514'

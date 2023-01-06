@@ -1,4 +1,0 @@
----
-## Be sure path is writable
-backup_path : '~/ansible-pan-labs/'
-...

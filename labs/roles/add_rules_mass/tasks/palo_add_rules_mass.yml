@@ -1,0 +1,120 @@
+##### Read the CSV file###
+- name: "Reading Firewall Rules from CSV"
+  community.general.read_csv:
+    path: roles/add_rules_mass/files/rules.csv
+  register: rules
+- debug:
+    var: rules
+  
+- name: Create Source Address Objects
+  paloaltonetworks.panos.panos_address_object:
+    provider: '{{ provider }}'
+    name: '{{ source_names.source_name }}'
+    address_type: '{{ source_names.source_name_type }}'
+    value: '{{ source_names.source_ip }}'
+    commit: '{{ commit }}'
+  loop: '{{ rules.list }}'
+  loop_control:
+    loop_var: source_names
+  when: source_names.source_name != ""
+  
+- name: Create Destination Address Objects
+  paloaltonetworks.panos.panos_address_object:
+    provider: '{{ provider }}'
+    name: '{{ dest_names.destination_name }}'
+    address_type: '{{ dest_names.destination_name_type }}'
+    value: '{{ dest_names.destination_ip }}'
+    commit: '{{ commit }}'
+  loop: '{{ rules.list }}'
+  loop_control:
+    loop_var: dest_names
+  when: (dest_names.destination_name != "") or (dest_names.destination_ip != "any")
+
+- name: Add Firewall Security Rules with Source Name and Dest Name
+  paloaltonetworks.panos.panos_security_rule:
+    provider: '{{ provider }}'
+    state: '{{ state }}'
+    location: '{{ location }}'
+    existing_rule: '{{ existing_rule }}'
+    rule_name: '{{ rules1.rule_name }}'
+    description: '{{ rules1.description }}'
+    source_zone: ['{{ rules1.source_zone }}']
+    destination_zone: ['{{ rules1.destination_zone }}']
+    source_ip: ['{{ rules1.source_name }}']
+    destination_ip: ['{{ rules1.destination_name}}']
+    application: ['{{ rules1.application }}']
+    service: ['{{ rules1.service }}']
+    log_setting: '{{ rules1.log_setting }}'
+    action: '{{ fwaction }}'
+    commit: '{{ commit }}'
+  loop: '{{ rules.list }}'
+  loop_control:
+    loop_var: rules1
+  when: (rules1.source_name != "") and (rules1.destination_name != "")
+  
+- name: Add Firewall Security Rules with No Source Name and No Destination Name
+  paloaltonetworks.panos.panos_security_rule:
+    provider: '{{ provider }}'
+    state: '{{ state }}'
+    location: '{{ location }}'
+    existing_rule: '{{ existing_rule }}'
+    rule_name: '{{ rules2.rule_name }}'
+    description: '{{ rules2.description }}'
+    source_zone: ['{{ rules2.source_zone }}']
+    destination_zone: ['{{ rules2.destination_zone }}']
+    source_ip: ['{{ rules2.source_ip }}']
+    destination_ip: ['{{ rules2.destination_ip }}']
+    application: ['{{ rules2.application }}']
+    service: ['{{ rules2.service }}']
+    log_setting: '{{ rules2.log_setting }}'
+    action: '{{ fwaction }}'
+    commit: '{{ commit }}'
+  loop: '{{ rules.list }}'
+  loop_control:
+    loop_var: rules2
+  when: (rules2.source_name == "") and (rules2.destination_name == "")
+  
+- name: Add Firewall Security Rules with No Source Name and has Destination Name
+  paloaltonetworks.panos.panos_security_rule:
+    provider: '{{ provider }}'
+    state: '{{ state }}'
+    location: '{{ location }}'
+    existing_rule: '{{ existing_rule }}'
+    rule_name: '{{ rules3.rule_name }}'
+    description: '{{ rules3.description }}'
+    source_zone: '{{ rules3.source_zone }}'
+    destination_zone: '{{ rules3.destination_zone }}'
+    source_ip: '{{ rules3.source_ip }}'
+    destination_ip: '{{ rules3.destination_name }}'
+    application: '{{ rules3.application }}'
+    service: '{{ rules3.service }}'
+    log_setting: '{{ rules3.log_setting }}'
+    action: '{{ fwaction }}'
+    commit: '{{ commit }}'
+  loop: '{{ rules.list }}'
+  loop_control:
+    loop_var: rules3
+  when: (rules3.source_name == "") and (rules3.destination_name != "")
+  
+- name: Add Firewall Security Rules with Source Name and has no Destination Name
+  paloaltonetworks.panos.panos_security_rule:
+    provider: '{{ provider }}'
+    state: '{{ state }}'
+    location: '{{ location }}'
+    existing_rule: '{{ existing_rule }}'
+    rule_name: '{{ rules4.rule_name }}'
+    description: '{{ rules4.description }}'
+    source_zone: '{{ rules4.source_zone }}'
+    destination_zone: '{{ rules4.destination_zone }}'
+    source_ip: '{{ rules4.source_name }}'
+    destination_ip: '{{ rules4.destination_ip }}'
+    application: '{{ rules4.application }}'
+    service: '{{ rules4.service }}'
+    log_setting: '{{ rules4.log_setting }}'
+    action: '{{ fwaction }}'
+    commit: '{{ commit }}'
+  loop: '{{ rules.list }}'
+  loop_control:
+    loop_var: rules4
+  when: (rules4.source_name != "") and (rules4.destination_name == "")
+    
