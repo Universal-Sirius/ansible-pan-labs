@@ -465,4 +465,193 @@ Run the playbook:
     Verifying that the playbook did what you expected. Login to the Palo Alto with your web browser to see
     what was configured.
 
+## Lab 1.4: Add a Simple Security Rule
 
+**Note: This lab is required prior to lab 1.5. It adds a deny all rule to the end of the
+security policy which is referenced in the next playbook.**
+
+Lab Goals:
+1. Add a Deny All rule to the end of the security policy.
+
+
+*Step 1 – Review the Playbook*
+
+    Look at the file called 1.4_simple_security_rule_add.yml
+    siduser101@jump:~/pan-labs-ee-1/project$ cat 1.4_simple_security_rule_add.yml
+    
+**Note: This playbook does not use a role. We did this to illustrate how to use collections
+in a playbook where roles are not included**
+
+*Step 2 – Run the Playbook*
+
+    Run the playbook:
+    siduser101@jump:~/pan-labs-ee-1/project$ # ansible-navigator run 1.4_simple_security_rule_add.yml
+    << output omitted >>
+    
+*Step 3 – Complete Verification*
+
+    Verifying that the playbook did what you expected. Login to the Palo Alto with your web browser to see
+    what was configured.
+    
+
+### Lab 1.5: Adding Bulk Security Rules from a CSV file 
+
+Lab Goals:
+1. Use a CSV file to add a bulk set of security rules to the firewall
+
+*Step 1 - Review the Playbook*
+
+Look at the file called 1.5_add_rules_csv.yml
+siduser101@jump:~/pan-labs-ee-1/project$ cat 1.5_add_rules_csv.yml
+
+*Step 2- Review the Playbook Files*
+
+    Use cat or github to review the roles tasks, roles variables and the roles files.
+    Note: This playbook pulls variables from a CSV file.
+
+*Step 3 – Run the Playbook*
+
+    Run the playbook:
+    siduser101@jump:~/pan-labs-ee-1/project$ ansible-navigator run 1.5_add_rules_csv.yml
+    << output omitted >>
+
+*Step 4 - Complete Verification*
+
+    Verifying that the playbook did what you expected. Login to the Palo Alto with your web browser to see
+    what was configured.
+
+*Bonus Task!*
+
+    Edit the CSV file and add additional rules by running the playbook again.
+    
+
+### Lab 1.6: Remove Address Object
+
+Lab Goals:
+1. Remove an address object from the firewall.
+
+
+#Step 1 – Review the Playbook*
+
+    Look at the file called 1.6_remove_address_object.yml
+    siduser101@jump:~/pan-labs-ee-1/project$ cat 1.6_remove_address_object.yml
+
+*Step 2 - Review the Playbook Associated Files*
+
+    Use cat or github to review the roles tasks and roles variables
+
+*Step 3 - Edit Variable File*
+
+    Modify the variable file to a server of your choosing using nano, vi or github
+    Example
+    remove_addr: 'server_6'
+
+*Step 4 – Run the Playbook*
+
+Run the playbook:
+
+     siduser101@jump:~/pan-labs-ee-1/project$ ansible-navigator run 1.6_remove_address_object.yml
+    << output omitted >>
+    
+*Step 5 – Complete Playbook Verification*
+
+    Verifying that the playbook did what you expected. Login to the Palo Alto with your web browser to see
+    what was configured.
+    
+**Why is the rule greyed out?**
+
+**Can you think of some use cases for this role?**
+
+
+
+### Lab 1.7: Backup Palo Alto Firewall Configuration
+
+Lab Goals:
+1. Complete a backup of the current Palo Alto configuration.
+
+*Step 1 - Review the Playbook*
+
+    Look at the file called 1.7_palo_backup_configuration.yml
+    siduser101@jump:~/pan-labs-ee-1/project$ cat 1.7_palo_backup_configuration.yml
+
+*Step 2 - Review the Playbook Associated Files*
+    Review the roles tasks and roles variables with cat or GitHub. The variable file should look like below.
+
+    ---
+    ## Be sure path is writable
+    backup_path : '~/ansible-pan-labs/'
+    ... 
+*Step 3 – Run the Backup Playbook*
+
+    Run the playbook:
+    siduser101@jump:~/pan-labs-ee-1/project$ ansible-navigator run 1.7_palo_backup_configuration.yml
+    << output omitted >>
+    
+*Step 4 – Review the Backup File*
+
+    Ensure that the backup file exists. Copy the backup file name
+    Can you think of some use cases for this role?
+
+
+## Lab 1.8: Restore the configuration
+
+Lab Goals:
+1. Restore a previously backed up configuration to the firewall.
+
+*Step 1 - Review the Playbook*
+
+Look at the file called 1.8_palo_restore_configuration.yml
+siduser101@jump:~/pan-labs-ee-1/project$ cat 1.8_palo_restore_configuration.yml
+
+*Step 2 - Review the Playbook Associated Files*
+
+    Review the roles variables with cat or github. The variable file should look like below.
+    ---
+    backup_path : 'home/siduser<ID>/ansible-pan-labs/'
+    restore_file: 'backup-2021-01-01-00-01.xml'
+    ...
+    
+    Edit the backup_path variable to have your siduser ID.
+    Edit the restore_file variable to be your saved backup file name.
+    
+*Step 3 – Run the Restore Playbook*
+
+
+    Run the playbook:
+    siduser101@jump:~/pan-labs-ee-1/project$ ansible-navigator run 1.8_palo_restore_configuration.yml
+    << output omitted >>
+    
+
+## Success – Congratulations for Completing!
+
+#### Key Lab Takeaways
+1. Remember YAML is very sensitive to correct indentation.
+2. The use of an Ansible role is best practice when there is a well-defined scope with a high
+possibility of re-use.
+3. Plan to the location of variables carefully. Never have a single variable in more than one location.
+4. If you copy and paste text for a playbook you may get indentation issues. Ansible provides a
+simple syntax checker, try ansible-playbook --syntax-check backup.yml to verify. A Best Practice
+is to use a linter, for example ansible-review.
+5. Ansible provides excellent online documentation, which is also available from the command line,
+for example ansible-doc ansible.netcommon.cli_command. For a full list of modules try ansibledoc –-list
+Appendix A:
+Useful resource links and information
+
+**Links:**
+
+    Ansible Best Practices:
+    https://docs.ansible.com/ansible/latest/user_guide/playbooks_best_practices.html
+Variable precedence:
+https://docs.ansible.com/ansible/latest/user_guide/playbooks_variables.html#variable-precedence-whereshould-i-put-a-variable
+
+    Ansible Modules
+    https://docs.ansible.com/ansible/2.9/modules/modules_by_category.html
+    
+Ansible Galaxy
+https://galaxy.ansible.com/home
+
+    Ansible Palo Alto Module Reference
+    https://ansible-pan.readthedocs.io/en/latest/modules/index.html
+    
+Ansible Navigator Creator Guide
+https://access.redhat.com/documentation/enus/red_hat_ansible_automation_platform/2.1/html/ansible_navigator_creator_guide/index
