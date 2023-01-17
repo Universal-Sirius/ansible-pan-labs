@@ -320,5 +320,149 @@ Type 0 to review the image Information
 
 ![](images/image12.png)
 
+## Lab Prep
+
+
+*Step1* - Review the variables file:
+
+    siduser101@jump:~/pan-labs-ee-1/project$ cat group_vars/all.yml
+    provider:
+     username: 'siduser101'
+     password: 'Ans1ble!'
+     ip_address: siduser101.pan.mysidlabs.com
+ 
+*Step2* - Change the variables to match the user you setup in Part 1B
+
+siduser101@jump:~/pan-labs-ee-1/project$ nano group_vars/all.yml
+
+
+## Lab 1.1: Gather Facts from your Palo Alto Firewall
+
+**Lab Goals:**
+1. Show how to gather facts from a Palo Alto firewall. It will introduce the use of roles which will
+be used for most playbooks in this lab.
+2. We will review the JSON output from the panos_facts module and show how to filter and
+display specific information.
+
+
+*Step1* – Review the first playbook
+
+    Look at the file (ansible playbook) called 1.1_palo_facts.yml.
+    siduser101@jump:~/pan-labs-ee-1/project$ cat 1.1_palo_facts.yml
+     ---
+    - hosts: localhost
+     connection: local
+     gather_facts: False
+     tasks:
+     - include_role:
+     name: palo_facts
+     ...
+
+*Step2* – Take a look at the roles playbook for gathering Palo Alto firewall facts
+
+Ansible playbooks are YAML files. YAML is a structured encoding format that is also extremely human
+readable. In this case we are using “include_role:” explor the role palo_facts. 
+    
+    siduser101@jump:~/pan-labs-ee-1/project tree roles/palo_facts/
+
+![](images/image13.png)
+
+    siduser101@jump:~/pan-labs-ee-1/project$ cat roles/palo_facts/tasks/main.yml
+    << output omitted >>
+    siduser101@jump:~/pan-labs-ee-1/project$ cat roles/palo_facts/tasks/palo_facts.yml
+    << output omitted >>
+    
+***Notice the FQCN or fully qualified collection name
+paloaltonetworks.panos.panos_facts. This format is required when using roles
+with collections that are not installed in engine by default such as Palo Alto
+collections used in this lab.***
+
+    siduser101@jump:~/pan-labs-ee-1/project$ cat roles/palo_facts/tasks/palo_vr_facts.yml
+    << output omitted >>
+
+*Step 3* – Run the gather facts playbook
+
+Run the playbook:
+
+    siduser101@jump:~/pan-labs-ee-1/project$ ansible-navigator run 1.1_palo_facts.yml
+    << output omitted >>
+    
+*Step 4* - Review the output of the playbook Review the output.
+
+***Can you think of some use cases for this role?***
+
+## Lab 1.2: Preform a Palo Alto Firewall Base Configuration
+
+Lab Goals:
+1. Review and use role variables in a role
+2. Complete the initial configuration setup using Ansible for a Palo Alto firewall
+
+*Step 1* – Review the Palo Alto Initial Setup Ansible Playbook 
+
+Review the file called 1.2_palo_initial_setup.yml
+
+    siduser101@jump:~/pan-labs-ee-1/project$ cat 1.2_palo_initial_setup.yml
+    << output omitted >>
+    explore the role
+    siduser101@jump:~/pan-labs-ee-1/project$ tree roles/initial_palo_setup/
+    << output omitted >> 
+
+
+
+***Note: Notice that there is a vars directory. This is known as roles vars***
+
+    siduser101@jump:~/pan-labs-ee-1/project$ cat roles/initial_palo_setup/vars/main.yml
+    << output omitted >>
+    
+
+### Tip
+When a variable file exists in the roles directory structure in the vars folder and is
+called “main.yml” it will be called into the playbook by default, there is no need to
+reference a specific vars file in the playbook. This is useful because all the vars
+required for the specific role are located with the role. This can make modular
+playbook design using roles easier.
+
+
+*Step 2 – Run the Initial Setup Playbook*
+
+Run the playbook:
+
+    siduser101@jump:~/pan-labs-ee-1/project$ ansible-navigator run 1. 2_palo_initial_setup.yml
+    << output omitted >>
+
+*Step 3 – Verify the Palo Alto Configuration*
+
+    Verifying that the playbook did what you expected. Login to the Palo Alto with your web browser to see
+    what was configured. https://siduser<<ID>>.pan.mysidlabs.com
+
+
+### Lab 1.3: Add logging server profile
+
+Lab Goals:
+1. Add a logging server profile to the firewall
+
+*Step 1- Review the Palo Alto Logging Setup Ansible Playbook*
+
+Look at the file called 1.3_logging_setup.yml 
+
+    siduser101@jump:~/pan-labs-ee-1/project$ cat 1.3_logging_setup.yml
+    << output omitted >>
+    siduser101@jump:~/pan-labs-ee-1/project$ tree roles/palo_log_server/
+    << output omitted >>siduser101@jump:~/pan-labs-ee-1/project$ tree roles/palo_syslog/
+    << output omitted >>
+    
+***Note: Use GitHub to look at the roles and roles vars***
+
+*Step 2 – Run the Palo Alto Logging Setup Playbook*
+
+Run the playbook:
+
+    siduser101@jump:~/pan-labs-ee-1/project$ ansible-navigator run 1.3_logging_setup.yml
+    << output omitted >>
+
+*Step 3 – Complete Verification*
+
+    Verifying that the playbook did what you expected. Login to the Palo Alto with your web browser to see
+    what was configured.
 
 
